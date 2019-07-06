@@ -8,13 +8,6 @@ import random
 speed=80/3.6
 kwh = float(0.000127)
 
-def make_request(originLat, originLon, destinationLat, destinationLon):
-    json_raw=requests.get("https://routing.openstreetmap.de/routed-car/route/v1/driving/"+
-                      originLat+","+originLon+";"+
-                      destinationLat+","+destinationLon+
-                      "?overview=false&alternatives=false&steps=true",verify=False).text
-    return json.loads(json_raw)
-
 def make_google_request(originLat, originLon, destinationLat, destinationLon):
     url="https://maps.googleapis.com/maps/api/directions/json?origin={}&destination={}&key=AIzaSyDH1DIIcc-YLodq4RnbKAABf4ctWTRXaF4".format(",".join((originLat,originLon)), ",".join((destinationLat, destinationLon)))
     response=requests.get(url, verify=False).text
@@ -67,16 +60,6 @@ def map_google_stops(search, resp, initial_time):
         search['consumptions'].append(consumption2)
     return search
 
-def map_stops(search, resp, initial_time):
-    search["consumptions"] = []
-    current_time = initial_time
-    with open('output.json', 'w') as f:
-        f.write(json.dumps(resp))
-    for el in resp["routes"][0]["legs"][0]["steps"]:
-        current_time = get_time(el["distance"], current_time)
-        consumption = {"time": str(current_time), "lat":el["maneuver"]["location"][0], "lon": el["maneuver"]["location"][1], "consumption": get_consumption(el["distance"]) }
-        search["consumptions"].append(consumption)
-    return search
 
 def get_consumption(distance):
     return distance * kwh
