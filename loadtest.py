@@ -53,9 +53,12 @@ for file in os.scandir(PATH):
     if file.name.endswith(".txt"):
         with open (file) as f:
             f_content=f.read()
-            date, consumption, prediction=process(f_content)
-            csv_data = create_csv(date, consumption, prediction)
-            writer.writerows(csv_data)
+            try:
+                date, consumption, prediction=process(f_content)
+                csv_data = create_csv(date, consumption, prediction)
+                writer.writerows(csv_data)
+            except IndexError:
+                continue
              
 
 csv_file.close()                
